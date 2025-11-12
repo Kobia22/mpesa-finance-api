@@ -2,31 +2,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Use SQLite for development (no setup needed)
+SQLALCHEMY_DATABASE_URL = "sqlite:///./mpesa_finance.db"
 
-# Database URL (PostgreSQL - will use SQLite for now, switch later)
-SQLALCHEMY_DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "sqlite:///./mpesa_finance.db"  # Local SQLite for development
-)
-
-# Create engine
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
+    connect_args={"check_same_thread": False}  # Required for SQLite
 )
 
-# Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base class for models
 Base = declarative_base()
 
-# Dependency to get DB session
+# Dependency
 def get_db():
     db = SessionLocal()
     try:
